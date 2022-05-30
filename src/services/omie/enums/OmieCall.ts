@@ -1,0 +1,15 @@
+export enum OmieCall {
+  ListarContasReceber = "ListarContasReceber",
+  ListarContasPagar = "ListarContasPagar",
+  ListarClientes = "ListarClientes",
+  ListarTags = "ListarTags",
+  PesquisarPedCompra = "PesquisarPedCompra",
+  ListarProdutos = "ListarProdutos",
+  ListarMovimentos = "ListarMovimentos",
+  LancarRecebimento = "LancarRecebimento",
+  AlterarContaReceber = "AlterarContaReceber",
+  ConsultarContaReceber = "ConsultarContaReceber",
+  ExcluirContaReceber = "ExcluirContaReceber",
+  IncluirContaReceber = "IncluirContaReceber",
+  AlterarDistribuicaoDepartamento = "AlterarDistribuicaoDepartamento",
+}

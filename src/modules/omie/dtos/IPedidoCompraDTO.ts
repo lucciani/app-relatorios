@@ -1,0 +1,54 @@
+import { ICabecalhoConsultaDTO } from "./ICabecalhoConsultaDTO";
+import { IFreteConsultaDTO } from "./IFreteConsultaDTO";
+import { IItemPedidoCompraDTO } from "./IItemPedidoCompraDTO";
+import { IParcelaPedidoCompraDTO } from "./IParcelaPedidoCompraDTO";
+import { IPedidoCompraDepartamentoDTO } from "./IPedidoCompraDepartamentoDTO";
+
+interface IPedidoCompraDTO {
+  nCodPed?: number;
+  ID_Empresa?: number;
+  cabecalho_consulta?: ICabecalhoConsultaDTO;
+  frete_consulta?: IFreteConsultaDTO;
+  produtos_consulta?: IItemPedidoCompraDTO[];
+  parcelas_consulta?: IParcelaPedidoCompraDTO[];
+  departamentos_consulta?: IPedidoCompraDepartamentoDTO[];
+  cCodIntPed?: string;
+  dIncData?: string;
+  cEtapa?: string;
+  cNumero?: string;
+  dDtPrevisao?: string;
+  cCodParc?: string;
+  nQtdeParc?: string;
+  nCodFor?: number;
+  cCodIntFor?: string;
+  cCodCateg?: string;
+  nCodCompr?: number;
+  cContato?: string;
+  nCodCC?: number;
+  nCodIntCC?: string;
+  nCodProj?: number;
+  cNumPedido?: string;
+  cObs?: string;
+  cObsInt?: string;
+  frete_nCodTransp?: number;
+  frete_cCodIntTransp?: string;
+  frete_cTpFrete?: string;
+  frete_cPlaca?: string;
+  frete_cUF?: string;
+  frete_nQtdVol?: number;
+  frete_cEspVol?: string;
+  frete_cMarVol?: string;
+  frete_cNumVol?: string;
+  frete_nPesoLiq?: number;
+  frete_nPesoBruto?: number;
+  frete_nValFrete?: number;
+  frete_nValSeguro?: number;
+  frete_cLacre?: string;
+  frete_ValOutras?: number;
+  created_at?: Date;
+  updated_at?: Date;
+  setCreateDate(): void;
+  setUpdateDate(): void;
+}
+
+export { IPedidoCompraDTO };

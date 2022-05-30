@@ -1,0 +1,54 @@
+stages:
+  - build-docker-prod
+  - deploy-producao
+
+Buildando imagem do Docker:
+  stage: build-docker-prod
+  image: docker:stable
+  services:
+    - docker:dind
+  script:
+    - docker login -u "$HARBOR_LOGIN" -p "$HARBOR_PASSWORD" harbor.opovo.com.br
+    - docker build -t harbor.opovo.com.br/tools/app_relatorios_omie:prod .
+    - docker push harbor.opovo.com.br/tools/app_relatorios_omie:prod
+  only:
+    - master
+
+Deploy producao:
+  stage: deploy-producao
+  image: harbor.opovo.com.br/tools/rsync-ssh
+  before_script:
+    - 'command -v ssh-agent >/dev/null || (apk add openssh-client)'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan "$SSH_KNOWN_HOSTS_SERV_API" > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - ssh "$SSH_USER"@"$SSH_KNOWN_HOSTS_SERV_API" 'docker container rm -f app_relatorios_omie || true'
+    - ssh "$SSH_USER"@"$SSH_KNOWN_HOSTS_SERV_API" 'docker image rm -f  harbor.opovo.com.br/tools/app_relatorios_omie:prod || true'
+    - >
+      ssh "$SSH_USER"@"$SSH_KNOWN_HOSTS_SERV_API"
+      "docker container run
+      -e TYPEORM_CONNECTION='$TYPEORM_CONNECTION'
+      -e TYPEORM_HOST='$TYPEORM_HOST'
+      -e TYPEORM_USERNAME='$TYPEORM_USERNAME'
+      -e TYPEORM_PASSWORD='$TYPEORM_PASSWORD'
+      -e TYPEORM_DATABASE='$TYPEORM_DATABASE'
+      -e TYPEORM_PORT='$TYPEORM_PORT'
+      -e TYPEORM_SYNCHRONIZE='$TYPEORM_SYNCHRONIZE'
+      -e TYPEORM_LOGGING='$TYPEORM_LOGGING'
+      -e TYPEORM_ENTITIES='$TYPEORM_ENTITIES'
+      -e TYPEORM_MIGRATIONS='$TYPEORM_MIGRATIONS'
+      -e TYPEORM_MIGRATIONS_DIR='$TYPEORM_MIGRATIONS_DIR'
+      -e TYPEORM_ENTITIES_DIR='$TYPEORM_ENTITIES_DIR'
+      -e REDIS_HOST='$REDIS_HOST'
+      -e REDIS_PORT='$REDIS_PORT'
+      -e REDIS_PASSWORD=
+      -e APP_API_URL='$APP_API_URL'
+      -e APP_API_PORT='$APP_API_PORT'
+      -e URL_API_OMIE='$URL_API_OMIE'
+      -e FORGOT_MAIL_URL='$FORGOT_MAIL_URL' -di --name app_relatorios_omie -p 8006:3000 harbor.opovo.com.br/tools/app_relatorios_omie:prod || true"
+  only:
+    - master

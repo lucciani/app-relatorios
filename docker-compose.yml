@@ -1,0 +1,45 @@
+version: "3.7"
+
+services:
+  database_op:
+    image: postgres
+    container_name: database_op
+    restart: always
+    ports:
+      - 5432:5432
+    networks:
+      - default
+    environment:
+      - POSTGRES_USER=user_report
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=report_op
+    volumes:
+      - pgdata:/data/postgres
+
+  redis:
+    image: redis:alpine
+    ports: 
+      - 6379:6379
+
+  # app:
+  #   build: . 
+  #   container_name: report
+  #   ports:
+  #     - 3333:3333
+  #   networks:
+  #     - default
+  #   volumes:
+  #     - .:/usr/app
+  #     - /usr/app/node_modules
+  #   depends_on:
+  #      - database_op
+
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  default:
+    internal: false
+

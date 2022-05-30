@@ -1,0 +1,784 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Documentação do relatório OP",
+    "description": "API para geração de relatórios dos sistemas internos do OPOVO.",
+    "version": "1.0.0",
+    "contact": {
+      "email": "giancarlolucciani@gmail.com"
+    }
+  },
+  "paths": {
+    "/users": {
+      "post": {
+        "tags": [
+          "Usuário"
+        ],
+        "summary": "Criar um usuário",
+        "description": "Criação de usuário para acesso ao sistema de relatórios.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "name": "user name sample",
+                  "email": "user email sample",
+                  "password": "user password sample"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User created"
+          },
+          "400": {
+            "description": "User already exists"
+          }
+        }
+      }
+    },
+    "/sessions": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Autenticação do usuário",
+        "description": "Autenticação do usuário para acesso as funcionalidades do sistema de relatórios.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Email or password incorrect!"
+          }
+        }
+      }
+    },
+    "/empresas": {
+      "post": {
+        "tags": ["Empresas"],
+        "summary": "Criar uma empresa ",
+        "description": "Criação de uma empresa para a busca das informações na API da OMIE, utlizando os tokens de acesso.",
+        "security": [{
+          "bearerAuth": [
+
+          ]
+        }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "razao_social": {
+                    "type": "string"
+                  },
+                  "nome_fantasia": {
+                    "type": "string"
+                  },
+                  "cnpj": {
+                    "type": "string"
+                  },
+                  "ie": {
+                    "type": "string"
+                  },
+                  "apelido": {
+                    "type": "string"
+                  },
+                  "app_key": {
+                    "type": "string"
+                  },
+                  "app_secret": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "razao_social": "company razao social sample",
+                  "nome_fantasia": "company nome fantasia sample",
+                  "cnpj": "company cnpj sample",
+                  "ie": "company ie sample",
+                  "apelido": "apelido ie sample",
+                  "app_key": "company app_key sample",
+                  "app_secret": "company app_secret sample"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Company already exists"
+          }
+        }
+      }
+    },
+    "/contas-receber/lancar-recebimentos/empresas/{id_empresa}": {
+      "post": {
+        "tags": ["Contas a receber"],
+        "summary": "Realizar uma baixa de um lançamento ",
+        "description": "Criar uma baixa passando o ID da empresa e o corpo do lançamento.",
+        "parameters": [{
+          "in": "path",
+          "name": "id_empresa",
+          "description": "ID da empresa cadastrada no base de dados REPORT_OP.",
+          "required": true,
+          "type": "integer"
+        }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "codigo_lancamento": {
+                    "type": "number"
+                  },
+                  "codigo_conta_corrente": {
+                    "type": "number"
+                  },
+                  "valor": {
+                    "type": "number"
+                  },
+                  "data": {
+                    "type": "string"
+                  },
+                  "juros": {
+                    "type": "number"
+                  },
+                  "multa": {
+                    "type": "number"
+                  },
+                  "desconto": {
+                    "type": "number"
+                  },
+                  "nsu": {
+                    "type": "string"
+                  },
+                  "observacao": {
+                    "type": "string"
+                  }
+
+                },
+                "example": {
+                  "codigo_lancamento": 123456,
+                  "codigo_conta_corrente": 987654,
+                  "valor": 19.9,
+                  "data": "11/05/2022",
+                  "juros": 0.2,
+                  "desconto": 0.5,
+                  "multa": 0.25,
+                  "nsu": "123456",
+                  "observacao": "Obs sample"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Caso a baixa seja realizada com sucesso.",
+            "type": "object",
+            "properties": {
+              "retorno": {
+                "type": "integer",
+                "example": 0
+              },
+              "mensagem": {
+                "type": "string",
+                "example": "Mensagem de sucesso"
+              },
+              "code": {
+                "type": "integer",
+                "example": 200
+
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de regra de negócio."
+          },
+          "500": {
+            "description": "Caso a baixa não seja realizada ou já tenha realizada a baixa.",
+            "type": "object",
+            "properties": {
+              "retorno": {
+                "type": "integer",
+                "example": 1
+              },
+              "mensagem": {
+                "type": "string",
+                "example": "Mensagem de erro"
+              },
+              "code": {
+                "type": "integer",
+                "example": 500
+
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contas-receber/alterar/empresas/{id_empresa}": {
+      "post": {
+        "tags": ["Contas a receber"],
+        "summary": "Realizar uma alteração de um lançamento ",
+        "description": "Altera um lançamento passando o ID da empresa e o corpo do lançamento.",
+        "parameters": [{
+          "in": "path",
+          "name": "id_empresa",
+          "description": "ID da empresa cadastrada no base de dados REPORT_OP.",
+          "required": true,
+          "type": "integer"
+        }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "codigo_lancamento_omie": {
+                    "type": "number"
+                  },
+                  "data_vencimento": {
+                    "type": "string"
+                  },
+                  "valor_documento": {
+                    "type": "number"
+                  }
+                },
+                "example": {
+                  "codigo_lancamento_omie": 123456,
+                  "data_vencimento": "13/05/2022",
+                  "valor_documento": 500
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Caso a alteração seja realizada com sucesso.",
+            "type": "object",
+            "properties": {
+              "retorno": {
+                "type": "integer",
+                "example": 0
+              },
+              "mensagem": {
+                "type": "string",
+                "example": "Mensagem de sucesso"
+              },
+              "code": {
+                "type": "integer",
+                "example": 200
+
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de regra de negócio."
+          },
+          "500": {
+            "description": "Caso a alteração não seja realizada.",
+            "type": "object",
+            "properties": {
+              "retorno": {
+                "type": "integer",
+                "example": 1
+              },
+              "mensagem": {
+                "type": "string",
+                "example": "Mensagem de erro"
+              },
+              "code": {
+                "type": "integer",
+                "example": 500
+
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contas-receber/incluir/empresas/{id_empresa}": {
+      "post": {
+        "tags": ["Contas a receber"],
+        "summary": "Cria uma conta a receber - lançamento ",
+        "description": "Cria um lançamento passando o ID da empresa e o corpo do lançamento.",
+        "parameters": [{
+          "in": "path",
+          "name": "id_empresa",
+          "description": "ID da empresa cadastrada no base de dados REPORT_OP.",
+          "required": true,
+          "type": "integer"
+        }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "codigo_lancamento_omie": {
+                    "type": "number"
+                  },
+                  "codigo_lancamento_integracao": {
+                    "type": "string"
+                  },
+                  "codigo_cliente_fornecedor": {
+                    "type": "number"
+                  },
+                  "codigo_cliente_fornecedor_integracao": {
+                    "type": "string"
+                  },
+                  "data_vencimento": {
+                    "type": "string"
+                  },
+                  "valor_documento": {
+                    "type": "number"
+                  },
+                  "codigo_categoria": {
+                    "type": "string"
+                  },
+                  "data_previsao": {
+                    "type": "number"
+                  },
+                  "categorias": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "codigo_categoria": {
+                          "type": "string"
+                        },
+                        "valor": {
+                          "type": "number"
+                        },
+                        "percentual": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "id_conta_corrente": {
+                    "type": "number"
+                  },
+                  "numero_documento": {
+                    "type": "string"
+                  },
+                  "numero_parcela": {
+                    "type": "string"
+                  },
+                  "codigo_tipo_documento": {
+                    "type": "string"
+                  },
+                  "numero_documento_fiscal": {
+                    "type": "string"
+                  },
+                  "numero_pedido": {
+                    "type": "string"
+                  },
+                  "chave_nfe": {
+                    "type": "string"
+                  },
+                  "observacao": {
+                    "type": "string"
+                  },
+                  "codigo_barras_ficha_compensacao": {
+                    "type": "string"
+                  },
+                  "codigo_cmc7_cheque": {
+                    "type": "string"
+                  },
+                  "data_emissao": {
+                    "type": "string"
+                  },
+                  "id_origem": {
+                    "type": "string"
+                  },
+                  "operacao": {
+                    "type": "string"
+                  },
+                  "valor_pis": {
+                    "type": "number"
+                  },
+                  "retem_iss": {
+                    "type": "string"
+                  },
+                  "retem_inss": {
+                    "type": "string"
+                  },
+                  "bloqueado": {
+                    "type": "string"
+                  },
+                  "bloquear_baixa": {
+                    "type": "string"
+                  },
+                  "importado_api": {
+                    "type": "string"
+                  },
+                  "baixar_documento": {
+                    "type": "string"
+                  },
+                  "conciliar_documento": {
+                    "type": "string"
+                  },
+                  "acao": {
+                    "type": "string"
+                  },
+                  "lancamento_detalhe": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "nCodInt": {
+                          "type": "string"
+                        },
+                        "COO": {
+                          "type": "string"
+                        },
+                        "CCF": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "distribuicao": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "cCodDep": {
+                          "type": "string"
+                        },
+                        "cDesDep": {
+                          "type": "string"
+                        },
+                        "nValDep": {
+                          "type": "number"
+                        },
+                        "nPerDep": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "status_titulo": {
+                    "type": "string"
+                  },
+                  "codigo_vendedor": {
+                    "type": "number"
+                  },
+                  "codigo_projeto": {
+                    "type": "number"
+                  },
+                  "nsu": {
+                    "type": "string"
+                  },
+                  "data_registro": {
+                    "type": "string"
+                  },
+                  "tipo_agrupamento": {
+                    "type": "number"
+                  },
+                  "info": {
+                    "type": "object",
+                    "properties": {
+                      "dInc": {
+                        "type": "string"
+                      },
+                      "hInc": {
+                        "type": "string"
+                      },
+                      "uInc": {
+                        "type": "string"
+                      },
+                      "dAlt": {
+                        "type": "string"
+                      },
+                      "hAlt": {
+                        "type": "string"
+                      },
+                      "uAlt": {
+                        "type": "string"
+                      },
+                      "cImpAPI": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "boleto": {
+                    "type": "object",
+                    "properties": {
+                      "cGerado": {
+                        "type": "string"
+                      },
+                      "dDtEmBol": {
+                        "type": "string"
+                      },
+                      "cNumBoleto": {
+                        "type": "string"
+                      },
+                      "cNumBancario": {
+                        "type": "string"
+                      },
+                      "nPerJuros": {
+                        "type": "number"
+                      },
+                      "nPerMulta": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "nCodPedido": {
+                    "type": "number"
+                  },
+                  "bloquear_exclusao": {
+                    "type": "string"
+                  },
+                  "nCodOS": {
+                    "type": "number"
+                  }
+                },
+                "example": {
+                  "codigo_lancamento_omie": 12345,
+                  "codigo_lancamento_integracao": "12345",
+                  "codigo_cliente_fornecedor": 12345,
+                  "codigo_cliente_fornecedor_integracao": "12345",
+                  "data_vencimento": "01/01/2020",
+                  "valor_documento": 10.5,
+                  "codigo_categoria": "125",
+                  "data_previsao": "10/01/2020",
+                  "categorias": [{
+                    "codigo_categoria": "125",
+                    "valor": 10.5,
+                    "percentual": 0.02
+                  }],
+                  "id_conta_corrente": 987,
+                  "numero_documento": "1245",
+                  "numero_parcela": "999/999",
+                  "codigo_tipo_documento": "12",
+                  "numero_documento_fiscal": "345",
+                  "numero_pedido": "222",
+                  "chave_nfe": "ASD123",
+                  "observacao": "Obs de teste",
+                  "codigo_barras_ficha_compensacao": "12456",
+                  "codigo_cmc7_cheque": "1234",
+                  "data_emissao": "10/01/2020",
+                  "id_origem": "145",
+                  "operacao": "14",
+                  "valor_pis": 10.8,
+                  "retem_pis": "",
+                  "valor_cofins": 14.2,
+                  "retem_cofins": "",
+                  "valor_csll": 0.2,
+                  "retem_csll": "",
+                  "valor_ir": 1.5,
+                  "retem_ir": "",
+                  "valor_iss": 5.2,
+                  "retem_iss": "",
+                  "valor_inss": 5.2,
+                  "retem_inss": "",
+                  "bloqueado": "N",
+                  "bloquear_baixa": "",
+                  "importado_api": "S",
+                  "baixar_documento": "",
+                  "conciliar_documento": "",
+                  "acao": "A-Adiciona Valor / S-Subtrai valor / L-Lança valor",
+                  "lancamento_detalhe": [{
+                    "nCodInt": "123",
+                    "COO": "145",
+                    "CCF": "456"
+                  }],
+                  "distribuicao": [{
+                    "cCodDep": "1456",
+                    "cDesDep": "1025 - PRE",
+                    "nValDep": 0.2,
+                    "nPerDep": 0.5
+                  }],
+                  "status_titulo": "T",
+                  "codigo_vendedor": 123,
+                  "codigo_projeto": 123,
+                  "nsu": "45612",
+                  "data_registro": "01/01/2020",
+                  "boleto": {
+                    "cGerado": "Gerou boleto (S/N)?",
+                    "dDtEmBol": "10/10/2020",
+                    "cNumBoleto": "123",
+                    "cNumBancario": "123",
+                    "nPerJuros": 0.02,
+                    "nPerMulta": 0.05
+
+                  },
+                  "nCodPedido": "",
+                  "bloquear_exclusao": "Bloqueia a exclusão do registro. (S/N)",
+                  "nCodOS": ""
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Caso a inclusão seja realizada com sucesso.",
+            "type": "object",
+            "properties": {
+              "retorno": {
+                "type": "integer",
+                "example": 0
+              },
+              "mensagem": {
+                "type": "string",
+                "example": "Mensagem de sucesso"
+              },
+              "code": {
+                "type": "integer",
+                "example": 200
+
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de regra de negócio."
+          },
+          "500": {
+            "description": "Caso a inclusão não seja realizada.",
+            "type": "object",
+            "properties": {
+              "retorno": {
+                "type": "integer",
+                "example": 1
+              },
+              "mensagem": {
+                "type": "string",
+                "example": "Mensagem de erro"
+              },
+              "code": {
+                "type": "integer",
+                "example": 500
+
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contas-receber/excluir/empresas/{id_empresa}": {
+      "post": {
+        "tags": ["Contas a receber"],
+        "summary": "Realizar uma exclusão de um lançamento.",
+        "description": "Exclui um lançamento passando o ID da empresa e a chave_lancamento(codigo_lacamento_omie) para os lançamentos que não foram dada baixa.",
+        "parameters": [{
+          "in": "path",
+          "name": "id_empresa",
+          "description": "ID da empresa cadastrada no base de dados REPORT_OP.",
+          "required": true,
+          "type": "integer"
+        }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "chave_lancamento": {
+                    "type": "number"
+                  }
+                },
+                "example": {
+                  "chave_lancamento": 123456
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Caso a exclusão seja realizada com sucesso.",
+            "type": "object",
+            "properties": {
+              "retorno": {
+                "type": "integer",
+                "example": 0
+              },
+              "mensagem": {
+                "type": "string",
+                "example": "Mensagem de sucesso"
+              },
+              "code": {
+                "type": "integer",
+                "example": 200
+
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de regra de negócio."
+          },
+          "500": {
+            "description": "Caso a exclusão não seja realizada.",
+            "type": "object",
+            "properties": {
+              "retorno": {
+                "type": "integer",
+                "example": 1
+              },
+              "mensagem": {
+                "type": "string",
+                "example": "Mensagem de erro"
+              },
+              "code": {
+                "type": "integer",
+                "example": 500
+
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "securitySchemes": {
+        "bearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
+      }
+    }
+  }
+}
